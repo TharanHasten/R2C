@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { prism, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Search, Code, ArrowRight, X, Copy, Check } from 'lucide-react';
+import { Search, Code, ArrowRight, X, Copy, Check, Download, ExternalLink } from 'lucide-react';
 import axios from 'axios';
 import { useTheme } from '../../Theme/ThemeContext.jsx';
 
@@ -85,6 +85,31 @@ function Collection() {
     }
   };
 
+  const downloadCode = (snippet) => {
+    const fileExtensions = {
+      javascript: 'js',
+      python: 'py',
+      java: 'java',
+      cpp: 'cpp',
+      c: 'c',
+      html: 'html',
+      css: 'css',
+      react: 'jsx',
+      node: 'js',
+    };
+    
+    const extension = fileExtensions[snippet.language.toLowerCase()] || 'txt';
+    const fileName = `${snippet.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${extension}`;
+    
+    const element = document.createElement('a');
+    const file = new Blob([snippet.code], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = fileName;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   const getLanguageColor = (language) => {
     const colors = {
       javascript: isDark
@@ -121,6 +146,37 @@ function Collection() {
     return colors[language.toLowerCase()] || colors.default;
   };
 
+  // Enhanced syntax highlighter styles
+  const getEnhancedSyntaxStyle = () => {
+    if (isDark) {
+      return {
+        ...vscDarkPlus,
+        'pre[class*="language-"]': {
+          ...vscDarkPlus['pre[class*="language-"]'],
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+          border: '1px solid #334155',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+        },
+        'code[class*="language-"]': {
+          ...vscDarkPlus['code[class*="language-"]'],
+          textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+        }
+      };
+    } else {
+      return {
+        ...prism,
+        'pre[class*="language-"]': {
+          ...prism['pre[class*="language-"]'],
+          background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+          border: '1px solid #cbd5e1',
+          borderRadius: '16px',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+        }
+      };
+    }
+  };
+
   const bgClass = isDark
     ? 'min-h-screen transition-all duration-500 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800'
     : 'min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50';
@@ -128,7 +184,6 @@ function Collection() {
   const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
   const cardBg = isDark ? 'bg-gray-800/50' : 'bg-white';
   const cardBorder = isDark ? 'border-gray-700' : 'border-orange-100';
-  const syntaxTheme = isDark ? vscDarkPlus : prism;
 
   return (
     <div className={bgClass}>
@@ -257,18 +312,18 @@ function Collection() {
         </div>
       </section>
 
-      {/* Modal for Snippet Details */}
+      {/* Enhanced Modal for Snippet Details */}
       {selectedSnippet && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className={`relative ${cardBg} rounded-3xl p-6 sm:p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl border ${cardBorder} backdrop-blur-sm`}>
-        <button
-          onClick={closeModal}
-          className={`absolute top-4 right-4 p-2 rounded-full transition-all duration-300 ${
-            isDark ? 'text-gray-300 hover:text-orange-400 hover:bg-gray-800' : 'text-gray-600 hover:text-orange-500 hover:bg-gray-100'
-          }`}
-        >
-          <X size={20} />
-        </button>
+          <div className={`relative ${cardBg} rounded-3xl p-6 sm:p-8 max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl border ${cardBorder} backdrop-blur-sm`}>
+            <button
+              onClick={closeModal}
+              className={`absolute top-4 right-4 p-2 rounded-full transition-all duration-300 z-10 ${
+                isDark ? 'text-gray-300 hover:text-orange-400 hover:bg-gray-800' : 'text-gray-600 hover:text-orange-500 hover:bg-gray-100'
+              }`}
+            >
+              <X size={20} />
+            </button>
 
             <div className="pr-10 clear-both">
               <div className="flex items-start justify-between mb-6">
@@ -299,38 +354,109 @@ function Collection() {
                 </div>
               </div>
 
+              {/* Enhanced Code Section */}
               <div className="relative">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className={`text-lg font-semibold ${textPrimary}`}>Code</h3>
-                  <button
-                    onClick={() => copyToClipboard(selectedSnippet.code)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      copySuccess === 'Copied!' ? 'bg-green-500 text-white' : isDark ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                    }`}
-                    aria-label={copySuccess === 'Copied!' ? 'Code copied' : 'Copy code'}
-                  >
-                    {copySuccess === 'Copied!' ? <Check size={20} /> : <Copy size={20} />}
-                  </button>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`text-lg font-semibold ${textPrimary} flex items-center gap-2`}>
+                    <Code className="w-5 h-5" />
+                    Code Preview
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => copyToClipboard(selectedSnippet.code)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        copySuccess === 'Copied!' 
+                          ? 'bg-green-500 text-white' 
+                          : isDark 
+                            ? 'text-gray-300 hover:text-white hover:bg-gray-700 border border-gray-600' 
+                            : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100 border border-gray-300'
+                      }`}
+                      aria-label={copySuccess === 'Copied!' ? 'Code copied' : 'Copy code'}
+                    >
+                      {copySuccess === 'Copied!' ? (
+                        <>
+                          <Check size={16} />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={16} />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => downloadCode(selectedSnippet)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        isDark 
+                          ? 'text-gray-300 hover:text-white hover:bg-gray-700 border border-gray-600'
+                          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100 border border-gray-300'
+                      }`}
+                      aria-label="Download code"
+                    >
+                      <Download size={16} />
+                      Download
+                    </button>
+                  </div>
                 </div>
 
-                <div className="relative">
+                {/* Enhanced Syntax Highlighter */}
+                <div className="relative group">
                   <SyntaxHighlighter
                     language={selectedSnippet.language.toLowerCase()}
-                    style={syntaxTheme}
+                    style={getEnhancedSyntaxStyle()}
                     customStyle={{
-                      borderRadius: '1rem',
-                      padding: '1.5rem',
-                      background: isDark ? '#1e1e1e' : '#f8f9fa',
-                      border: isDark ? '1px solid #374151' : '1px solid #e5e7eb',
+                      borderRadius: '16px',
+                      padding: '24px',
+                      margin: 0,
                       fontSize: '14px',
-                      lineHeight: '1.5',
-                      maxHeight: '500px',
+                      lineHeight: '1.6',
+                      maxHeight: '600px',
                       overflow: 'auto',
+                      position: 'relative',
+                      ...(isDark ? {
+                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                        border: '1px solid #334155',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                      } : {
+                        background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                        border: '1px solid #cbd5e1',
+                        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                      })
                     }}
-                    showLineNumbers
+                    showLineNumbers={true}
+                    lineNumberStyle={{
+                      minWidth: '3em',
+                      paddingRight: '1em',
+                      color: isDark ? '#64748b' : '#94a3b8',
+                      fontSize: '12px',
+                      userSelect: 'none'
+                    }}
+                    wrapLines={true}
+                    wrapLongLines={true}
                   >
                     {selectedSnippet.code}
                   </SyntaxHighlighter>
+                  
+                  {/* Decorative gradient overlay */}
+                  <div className={`absolute inset-0 rounded-16px pointer-events-none ${
+                    isDark 
+                      ? 'bg-gradient-to-r from-slate-500/5 via-transparent to-blue-500/5'
+                      : 'bg-gradient-to-r from-slate-100/20 via-transparent to-blue-100/20'
+                  }`} />
+                </div>
+
+                {/* Code metrics */}
+                <div className={`mt-4 flex items-center gap-4 text-sm ${textSecondary}`}>
+                  <span className="flex items-center gap-1">
+                    Lines: {selectedSnippet.code.split('\n').length}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    Characters: {selectedSnippet.code.length}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    Size: {(new Blob([selectedSnippet.code]).size / 1024).toFixed(1)} KB
+                  </span>
                 </div>
               </div>
             </div>

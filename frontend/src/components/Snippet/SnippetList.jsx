@@ -18,6 +18,7 @@ function SnippetList() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [searchMode, setSearchMode] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({ show: false, snippet: null });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -81,18 +82,30 @@ function SnippetList() {
     handleSearch();
   };
 
-  const handleDelete = async (id, title) => {
-    if (!window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone! 🗑️`)) return;
+  const openDeleteModal = (snippet) => {
+    setDeleteModal({ show: true, snippet });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ show: false, snippet: null });
+  };
+
+  const handleDelete = async () => {
+    const { snippet } = deleteModal;
+    if (!snippet) return;
+
     try {
-      await axios.delete(`https://r2c-2z91.onrender.com/api/snippets/${id}`, {
+      await axios.delete(`https://r2c-2z91.onrender.com/api/snippets/${snippet._id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      const updatedSnippets = snippets.filter((snippet) => snippet._id !== id);
+      const updatedSnippets = snippets.filter((s) => s._id !== snippet._id);
       setSnippets(updatedSnippets);
-      setFilteredSnippets(searchMode ? filteredSnippets.filter((snippet) => snippet._id !== id) : updatedSnippets);
+      setFilteredSnippets(searchMode ? filteredSnippets.filter((s) => s._id !== snippet._id) : updatedSnippets);
       setError('');
+      closeDeleteModal();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete snippet');
+      closeDeleteModal();
     }
   };
 
@@ -118,6 +131,83 @@ function SnippetList() {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
+  // Delete Confirmation Modal
+  const DeleteModal = () => {
+    if (!deleteModal.show) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+          onClick={closeDeleteModal}
+        />
+        
+        {/* Modal */}
+        <div className={`relative w-full max-w-md p-6 rounded-2xl shadow-2xl transition-all duration-300 transform ${
+          isDark ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'
+        }`}>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
+                <Trash2 size={20} className="text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Delete Snippet
+              </h3>
+            </div>
+            <button
+              onClick={closeDeleteModal}
+              className={`p-1 rounded-lg transition-colors duration-200 ${
+                isDark ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-500'
+              }`}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="mb-6">
+            <p className={`text-sm mb-3 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+              Are you sure you want to delete this snippet? This action cannot be undone.
+            </p>
+            <div className={`p-3 rounded-lg border ${
+              isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
+            }`}>
+              <p className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                "{deleteModal.snippet?.title}"
+              </p>
+              <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                {deleteModal.snippet?.language} • {formatDate(deleteModal.snippet?.createdAt)}
+              </p>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button
+              onClick={closeDeleteModal}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+                isDark 
+                  ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              className="flex-1 py-2 px-4 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -227,7 +317,7 @@ function SnippetList() {
                       <Link to={`/mysnippet/${snippet._id}`} state={{ fromList: true }} 
                       className={`flex-1 flex items-center justify-center space-x-1 py-2 px-3 rounded-lg font-semibold text-white transition-all duration-300 ${isDark ? 'bg-gray-500 hover:bg-gray-700' : 'bg-gray-400 hover:bg-gray-700'}`}><Eye size={14} /><span>View</span></Link>
                       <Link to={`/mysnippet/edit/${snippet._id}`} className={`flex-1 flex items-center justify-center space-x-1 py-2 px-3 rounded-lg font-semibold text-white transition-all duration-300 ${isDark ? 'bg-orange-500 hover:bg-orange-600' : 'bg-orange-600 hover:bg-orange-700'}`}><Edit3 size={14} /><span>Edit</span></Link>
-                      <button onClick={() => handleDelete(snippet._id, snippet.title)} className={`p-2 rounded-lg font-semibold text-white transition-all duration-300 ${isDark ? 'bg-red-500 hover:bg-red-600' : 'bg-red-600 hover:bg-red-700'}`}><Trash2 size={14} /></button>
+                      <button onClick={() => openDeleteModal(snippet)} className={`p-2 rounded-lg font-semibold text-white transition-all duration-300 ${isDark ? 'bg-red-500 hover:bg-red-600' : 'bg-red-600 hover:bg-red-700'}`}><Trash2 size={14} /></button>
                     </div>
                   </div>
                 </div>
@@ -238,7 +328,6 @@ function SnippetList() {
                   <div className={`inline-flex p-3 rounded-xl mb-4 ${isDark ? 'bg-gradient-to-r from-orange-500 to-amber-500' : 'bg-gradient-to-r from-orange-600 to-amber-600'} transition-transform duration-300 hover:scale-110`}><FileText size={32} className="text-white" /></div>
                   <h3 className={`text-2xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'} transition-colors duration-300`}>No snippets yet!</h3>
                   <p className={`text-sm mb-6 ${isDark ? 'text-gray-300' : 'text-gray-600'} transition-colors duration-300`}>Create your first awesome code snippet to get started!</p>
-                  <Link to="/mysnippet/new" className={`px-4 py-2 rounded-lg font-semibold text-white transition-all duration-300 ${isDark ? 'bg-orange-500 hover:bg-orange-600' : 'bg-orange-600 hover:bg-orange-700'}`}><div className="flex items-center space-x-1"><Plus size={16} /><span>Create</span></div></Link>
                 </div>
               )
             )}
@@ -250,6 +339,9 @@ function SnippetList() {
           <Plus size={20} className="text-white" />
         </Link>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal />
     </div>
   );
 }

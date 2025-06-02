@@ -54,25 +54,33 @@ function Navbar() {
     } backdrop-blur-lg border-b shadow-sm`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-      <Link
-      to={isAuthenticated ? '/dashboard' : '/'}
-      className={`flex items-center space-x-2 sm:space-x-3 font-bold text-lg sm:text-xl transition-all duration-300 group ${
-        isDark
-          ? 'text-white hover:text-orange-400'
-          : 'text-gray-900 hover:text-orange-600'
-      }`}
-      >
+          {/* Logo with Enhanced R2C Branding */}
+          <Link
+            to={isAuthenticated ? '/dashboard' : '/'}
+            className={`flex items-center space-x-2 sm:space-x-3 font-bold text-lg sm:text-xl transition-all duration-300 group ${
+              isDark
+                ? 'text-white hover:text-orange-400'
+                : 'text-gray-900 hover:text-orange-600'
+            }`}
+          >
             <div className={`p-1.5 sm:p-2 rounded-lg transition-all duration-300 group-hover:scale-110 ${
               isDark 
                 ? 'bg-gradient-to-r from-orange-500 to-amber-500 shadow-lg shadow-orange-500/25' 
                 : 'bg-gradient-to-r from-orange-600 to-amber-600 shadow-lg shadow-orange-600/25'
             }`}>
-              <Code2 size={18} className="text-white" />
+              <Code2 size={20} className="text-white" />
             </div>
-            <span className="hidden xs:block sm:text-xl">R2C</span>
+            <div className="flex flex-col">
+              <span className="text-xl sm:text-2xl font-extrabold tracking-wide">R2C</span>
+              <span className={`text-xs font-medium tracking-wider uppercase ${
+                isDark 
+                  ? 'text-gray-400 group-hover:text-orange-300' 
+                  : 'text-gray-500 group-hover:text-orange-500'
+              } transition-colors duration-300`}>
+                Code Snippets
+              </span>
+            </div>
           </Link>
-
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
