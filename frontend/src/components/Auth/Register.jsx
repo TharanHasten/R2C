@@ -49,7 +49,7 @@ function Register() {
     setError('');
     
     try {
-      const response = await axios.post('/api/auth/register', {
+      const response = await axios.post('https://r2c-2z91.onrender.com', {
         username,
         email,
         password
