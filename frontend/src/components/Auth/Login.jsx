@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import axios from '../../axiosInstance';
 import { AuthContext } from '../../context/AuthContext.jsx';
 import { useTheme } from '../../Theme/ThemeContext.jsx';
 
@@ -21,7 +21,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await axios.post('https://r2c-2z91.onrender.com/api/auth/login', { email, password });
+      const response = await axios.post('/api/auth/login', { email, password });
       login(response.data.token); // Use AuthContext login
       navigate('/dashboard');
     } catch (err) {
