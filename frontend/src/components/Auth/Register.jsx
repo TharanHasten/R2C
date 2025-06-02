@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle } from 'lucide-react';
-import axios from '../../axiosInstance';
+import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext.jsx';
 import { useTheme } from '../../Theme/ThemeContext.jsx';
 
@@ -49,7 +49,7 @@ function Register() {
     setError('');
     
     try {
-      const response = await axios.post('/api/auth/register', {
+      const response = await axios.post('https://r2c-2z91.onrender.com/api/auth/register', {
         username,
         email,
         password
