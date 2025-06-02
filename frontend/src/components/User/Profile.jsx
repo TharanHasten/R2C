@@ -44,7 +44,7 @@ function Profile() {
       setIsLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('/api/user/dashboard', {
+        const response = await axios.get('https://r2c-2z91.onrender.com/api/user/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const { name, favoriteLanguage, bio, location, website, github, twitter, linkedin } = response.data.user.profile;
@@ -95,7 +95,7 @@ function Profile() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.put('/api/user/profile', { profile: formData }, {
+      await axios.put('https://r2c-2z91.onrender.com/api/user/profile', { profile: formData }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccess('Profile updated successfully!');

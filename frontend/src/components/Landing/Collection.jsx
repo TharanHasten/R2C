@@ -19,7 +19,7 @@ function Collection() {
     const fetchAllSnippets = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get('/api/snippets');
+        const response = await axios.get('https://r2c-2z91.onrender.com/api/snippets');
         setSnippets(response.data);
         setError('');
       } catch (err) {
@@ -47,7 +47,7 @@ function Collection() {
     }
     setIsLoading(true);
     try {
-      const response = await axios.get(`/api/snippets/search2?tags=${encodeURIComponent(cleanedTags)}`);
+      const response = await axios.get(`https://r2c-2z91.onrender.com/api/snippets/search2?tags=${encodeURIComponent(cleanedTags)}`);
       setSnippets(response.data);
       setError('');
     } catch (err) {

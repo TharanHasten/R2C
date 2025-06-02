@@ -21,7 +21,7 @@ function SnippetView() {
       setIsLoading(true);
       setError('');
       try {
-        const response = await axios.get(`/api/snippets/${id}`, {
+        const response = await axios.get(`https://r2c-2z91.onrender.com/api/snippets/${id}`, {
           headers: isAuthenticated ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {},
         });
         setSnippet(response.data);

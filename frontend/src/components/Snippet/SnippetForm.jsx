@@ -43,7 +43,7 @@ function SnippetForm() {
         setIsFetching(true);
         setError('');
         try {
-          const response = await axios.get(`/api/snippets/${id}`, {
+          const response = await axios.get(`https://r2c-2z91.onrender.com/api/snippets/${id}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
           });
           setFormData({
@@ -89,9 +89,9 @@ function SnippetForm() {
     try {
       const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
       if (id) {
-        await axios.put(`/api/snippets/${id}`, data, config);
+        await axios.put(`https://r2c-2z91.onrender.com/api/snippets/${id}`, data, config);
       } else {
-        await axios.post('/api/snippets', data, config);
+        await axios.post('https://r2c-2z91.onrender.com/api/snippets', data, config);
       }
       navigate('/mysnippet', { state: { fromEdit: true } });
     } catch (err) {

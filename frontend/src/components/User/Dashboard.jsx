@@ -37,8 +37,8 @@ function Dashboard() {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
         const [userResponse, snippetsResponse] = await Promise.all([
-          axios.get('/api/user/dashboard', config),
-          axios.get('/api/snippets/my-snippets', config),
+          axios.get('https://r2c-2z91.onrender.com/api/user/dashboard', config),
+          axios.get('https://r2c-2z91.onrender.com/api/snippets/my-snippets', config),
         ]);
         setDashboardData({ user: userResponse.data.user, snippets: snippetsResponse.data });
       } catch (err) {

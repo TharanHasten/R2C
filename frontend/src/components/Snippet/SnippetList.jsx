@@ -37,7 +37,7 @@ function SnippetList() {
     setIsLoading(true);
     setError('');
     try {
-      const response = await axios.get('/api/snippets/my-snippets', {
+      const response = await axios.get('https://r2c-2z91.onrender.com/api/snippets/my-snippets', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setSnippets(response.data);
@@ -62,7 +62,7 @@ function SnippetList() {
     setIsLoading(true);
     setError('');
     try {
-      const response = await axios.get('/api/snippets/search', {
+      const response = await axios.get('https://r2c-2z91.onrender.com/api/snippets/search', {
         params: { tags: searchQuery.trim() },
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
@@ -84,7 +84,7 @@ function SnippetList() {
   const handleDelete = async (id, title) => {
     if (!window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone! 🗑️`)) return;
     try {
-      await axios.delete(`/api/snippets/${id}`, {
+      await axios.delete(`https://r2c-2z91.onrender.com/api/snippets/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       const updatedSnippets = snippets.filter((snippet) => snippet._id !== id);
