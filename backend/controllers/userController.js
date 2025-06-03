@@ -5,7 +5,6 @@ const updateProfile = async (req, res) => {
   try {
     const { profile } = req.body;
 
-    // Manual validation
     if (profile.name && profile.name.length > 50) {
       return res.status(400).json({ message: 'Name must be 50 characters or less' });
     }

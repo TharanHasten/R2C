@@ -5,7 +5,6 @@ const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Manual validation
     if (!username || username.length < 3) {
       return res.status(400).json({ message: 'Username is required and must be at least 3 characters' });
     }
@@ -35,7 +34,6 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Manual validation
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ message: 'Invalid email' });
     }

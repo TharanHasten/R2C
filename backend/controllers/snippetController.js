@@ -4,7 +4,6 @@ const createSnippet = async (req, res) => {
   try {
     const { title, code, language, tags, description, isPublic } = req.body;
 
-    // Manual validation
     if (!title || title.length > 100) {
       return res.status(400).json({ message: 'Title is required and must be 100 characters or less' });
     }
