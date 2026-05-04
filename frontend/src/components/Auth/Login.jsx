@@ -22,7 +22,7 @@ function Login() {
 
     try {
       const response = await axios.post('https://r2c-2z91.onrender.com/api/auth/login', { email, password });
-      login(response.data.token); 
+      login(response.data.token); // Use AuthContext login
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
